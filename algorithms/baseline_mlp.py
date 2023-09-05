@@ -52,6 +52,7 @@ class SequenceToSangerMLP(nn.Module):
         self.fc4 = nn.Linear(self.hidden_sizes[2], output_size)
     
     def forward(self, x):
+        shape = x.shape
         x = x.view(x.size(0), -1)
         
         x = F.relu(self.bn1(self.fc1(x)))
@@ -59,5 +60,5 @@ class SequenceToSangerMLP(nn.Module):
         x = F.relu(self.bn3(self.fc3(x)))
         
         x = self.fc4(x)
-        return x.view(64, 300, 4)
+        return x.view(shape[0], shape[1], -1)
 
