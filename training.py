@@ -4,10 +4,10 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 import wandb
-from algorithms.lstm_cnn import SangerSequencingDataset, SequenceToSangerModel
+from algorithms.cnn import SangerSequencingDataset, SequenceToSangerModel
 
 # WandB – Initialize a new run
-wandb.init(entity="wandb", project="sanger-generator")
+wandb.init(entity="degtrdg", project="sanger-generator")
 
 # WandB – Config is a variable that holds and saves hyperparameters and inputs
 config = wandb.config
@@ -18,8 +18,8 @@ config.learning_rate = 1e-3
 config.epochs = 10
 
 # Define data folders
-fasta_folder = 'fasta_files'
-csv_folder = 'traces'
+fasta_folder = 'data/fasta_files'
+csv_folder = 'data/traces'
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
