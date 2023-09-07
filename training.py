@@ -42,23 +42,8 @@ wandb.watch(model, log="all")
 for epoch in range(config.epochs):
     for batch_fasta, batch_csv in dataloader:
         # batch_fasta = batch_fasta.transpose(2, 1).to(device)  for CNN
-        batch_fasta = batch_fasta.to(device)  
-        shape = batch_csv.shape
-        # Reshape the tensor
-        batch_csv_reshaped = batch_csv.view(-1, shape[-1])
-        
-        # Convert to numpy for scaling
-        batch_csv_np = batch_csv_reshaped.cpu().numpy()
-        
-        # Apply Min-Max scaling
-        scaler = MinMaxScaler()
-        batch_csv_scaled = scaler.fit_transform(batch_csv_np)
-        
-        # Convert back to tensor
-        batch_csv_tensor = torch.tensor(batch_csv_scaled, device=device)
-        
-        # Reshape to the original shape
-        batch_csv = batch_csv_tensor.view(shape).to(device)
+        batch_fasta = batch_fasta.to(device)
+        batch_csv = batch_csv.to(device)
 
         # Forward pass
         predictions = model(batch_fasta)
