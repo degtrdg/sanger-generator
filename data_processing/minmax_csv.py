@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import os
+import joblib
 
 # Define the path to the csv files
 csv_folder = 'data/traces'
@@ -22,6 +23,9 @@ all_data_df = pd.concat(all_data)
 
 # Fit the scaler to the entire dataset
 scaler.fit(all_data_df)
+
+# Save the fitted scaler for later use
+joblib.dump(scaler, 'data_processing/minmax_scaler.pkl')
 
 # Loop over all csv files in the folder again to transform each file
 for filename in os.listdir(csv_folder):

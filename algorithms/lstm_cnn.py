@@ -8,7 +8,7 @@ import numpy as np
 from Bio import SeqIO
 
 class SangerSequencingDataset(Dataset):
-    def __init__(self, fasta_folder, csv_folder, seq_length):
+    def __init__(self, fasta_folder, csv_folder, seq_length, start_bp=40):
         csv_files = [file for file in os.listdir(csv_folder)]
         csv_files = [file for file in csv_files if len(pd.read_csv(os.path.join(csv_folder, file)).values) > 0] # Don't include empty CSV files
         fasta_files = [file.replace('.csv', '.fasta') for file in csv_files]
@@ -16,8 +16,13 @@ class SangerSequencingDataset(Dataset):
         self.fasta_files = [os.path.join(fasta_folder, file) for file in fasta_files]
         self.csv_files = [os.path.join(csv_folder, file) for file in csv_files]
         self.seq_length = seq_length
+        self.start_bp = start_bp
 
         self.encoder = OneHotEncoder(sparse_output=False, categories=[['A', 'C', 'G', 'T', 'N']])
+
+        # Filter fasta_files and csv_files to only include sequences of length self.start_bp+self.seq_length
+        self.fasta_files = [file for file in self.fasta_files if len(str(list(SeqIO.parse(file, "fasta"))[0].seq)) >= self.start_bp+self.seq_length]
+        self.csv_files = [file for file in self.csv_files if len(pd.read_csv(file).values) >= self.start_bp+self.seq_length]
 
     def __len__(self):
         return len(self.fasta_files)
@@ -27,10 +32,11 @@ class SangerSequencingDataset(Dataset):
         fasta_sequence = str(list(SeqIO.parse(self.fasta_files[idx], "fasta"))[0].seq)
 
         # Convert FASTA sequence to one-hot encoding
-        fasta_sequence = self.encoder.fit_transform(np.array(list(fasta_sequence)[:self.seq_length]).reshape(-1, 1))
+        fasta_sequence = self.encoder.fit_transform(np.array(list(fasta_sequence)[self.start_bp:self.start_bp+self.seq_length]).reshape(-1, 1))
 
         # Read CSV file
-        csv_sequence = pd.read_csv(self.csv_files[idx]).values[:self.seq_length]
+        csv_sequence = pd.read_csv(self.csv_files[idx]).values[self.start_bp:self.start_bp+self.seq_length]
+        csv_sequence = csv_sequence.transpose(2, 1) # for CNN
 
         return torch.tensor(fasta_sequence, dtype=torch.float32), torch.tensor(csv_sequence, dtype=torch.float32)
 
