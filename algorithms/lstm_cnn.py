@@ -33,10 +33,10 @@ class SangerSequencingDataset(Dataset):
 
         # Convert FASTA sequence to one-hot encoding
         fasta_sequence = self.encoder.fit_transform(np.array(list(fasta_sequence)[self.start_bp:self.start_bp+self.seq_length]).reshape(-1, 1))
+        fasta_sequence = fasta_sequence.transpose(2, 1) # for CNN
 
         # Read CSV file
         csv_sequence = pd.read_csv(self.csv_files[idx]).values[self.start_bp:self.start_bp+self.seq_length]
-        csv_sequence = csv_sequence.transpose(2, 1) # for CNN
 
         return torch.tensor(fasta_sequence, dtype=torch.float32), torch.tensor(csv_sequence, dtype=torch.float32)
 
