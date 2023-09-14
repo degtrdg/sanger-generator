@@ -1,6 +1,6 @@
 from torch.utils.data import Dataset
 import torch.nn as nn
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 import os
 import pandas as pd
 import torch
@@ -37,6 +37,9 @@ class SangerSequencingDataset(Dataset):
 
         # Read CSV file
         csv_sequence = pd.read_csv(self.csv_files[idx]).values[self.start_bp:self.start_bp+self.seq_length]
+
+        scaler = MinMaxScaler()
+        csv_sequence = scaler.fit_transform(csv_sequence)
 
         return torch.tensor(fasta_sequence, dtype=torch.float32), torch.tensor(csv_sequence, dtype=torch.float32)
 
