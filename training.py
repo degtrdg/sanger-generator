@@ -46,7 +46,6 @@ if not os.path.exists('model_checkpoints'):
 for epoch in range(config.epochs):
     for batch_fasta, batch_csv in dataloader:
 
-        # batch_fasta = batch_fasta.transpose(2, 1).to(device)  for CNN
         batch_fasta = batch_fasta.to(device)
         batch_csv = batch_csv.to(device)
 
